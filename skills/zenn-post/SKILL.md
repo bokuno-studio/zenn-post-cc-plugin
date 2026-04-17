@@ -1,6 +1,6 @@
 ---
 name: zenn-post
-description: Zennに記事を書いて公開する。「Zennに上げて」「Zennに投稿して」「Zennに出して」と言われたら使う。NotionページをZennに投稿する場合も使う。
+description: Zennに記事を書いて公開する。「Zennに上げて」「Zennに投稿して」「Zennに出して」と言われたら使う。NotionページをZennに投稿する場合も使う。「dev.toにも上げて」と言われたらdev.toにも英訳して投稿する。
 argument-hint: [NotionのURLまたはタイトル、またはテーマ]
 allowed-tools: [Read, Edit, Write, Bash]
 ---
@@ -18,7 +18,7 @@ allowed-tools: [Read, Edit, Write, Bash]
 
 > **セットアップ手順**
 > 1. [Zenn アカウント作成](https://zenn.dev)
-> 2. zenn-content リポジトリを GitHub に作成し、Zenn と連携
+> 2. zenn-content リポジトリを GitHub に作成し、Zenn と連携（**public** リポジトリにすること）
 > 3. `npx zenn-cli init` でリポジトリを初期化
 > 4. このスキルの環境情報を自分のパスに書き換える
 
@@ -89,7 +89,84 @@ git push origin main
 
 push 完了を伝えて終了。`https://zenn.dev/your_username` に1〜2分で反映される。
 
+---
+
+## dev.to への同時投稿（オプション）
+
+「dev.toにも上げて」と言われた場合、Zenn 記事の公開後に以下を実行する。
+
+### dev.to 環境情報
+
+- API キー: `.env` ファイルの `DEVTO_API_KEY`（`.gitignore` で除外すること）
+- 画像置き場: `zenn-content/images/`（`raw.githubusercontent.com` 経由で公開）
+
+### dev.to 投稿フロー
+
+#### 1. 記事を英訳する
+
+Zenn 記事の本文を英語に翻訳する。Zenn 独自記法は以下に変換：
+
+| Zenn 記法 | dev.to Markdown |
+|-----------|----------------|
+| `:::message` ... `:::` | `> **Note:** ...` |
+| `:::message alert` ... `:::` | `> **⚠️ Warning:** ...` |
+| ```` ```mermaid ``` ```` | → 下記手順で画像に変換 |
+
+#### 2. Mermaid 図を画像に変換する
+
+記事中の mermaid コードブロックをすべて画像に変換する。
+dev.to は Mermaid をレンダリングしないため、画像化が必要。
+
+```bash
+# 1. mermaid コードをファイルに書き出す
+cat > /tmp/diagram.mmd << 'EOF'
+<mermaidコード>
+EOF
+
+# 2. PNG 生成（外部サービス不要・ローカル完結）
+npx @mermaid-js/mermaid-cli -i /tmp/diagram.mmd -o /tmp/diagram.png -t default -b white
+
+# 3. zenn-content の images/ にコピーして push
+cp /tmp/diagram.png "/path/to/your/zenn-content/images/<slug>-diagram.png"
+cd "/path/to/your/zenn-content"
+git add images/<slug>-diagram.png
+git commit -m "feat: add diagram image for <slug>"
+git push origin main
+```
+
+push 後、以下の URL で画像が公開される：
+```
+https://raw.githubusercontent.com/your-github-username/zenn-content/main/images/<ファイル名>
+```
+
+記事内の mermaid ブロックをこの URL の `![図の説明](URL)` に置き換える。
+
+#### 3. dev.to に投稿する
+
+```bash
+source /path/to/.env  # DEVTO_API_KEY を読み込む
+
+curl -X POST https://dev.to/api/articles \
+  -H "api-key: $DEVTO_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "article": {
+      "title": "<英語タイトル>",
+      "published": true,
+      "tags": ["tag1", "tag2", "tag3", "tag4"],
+      "body_markdown": "<本文>"
+    }
+  }'
+```
+
+- tags は最大4つ、英小文字のみ
+- 投稿後に返ってくる `url` をユーザーに伝える
+
+---
+
 ## 注意事項
 
 - 公開前に必ずユーザー確認（`published: true` にする前）
 - 画像を使う場合は `images/` ディレクトリに置いて `![alt](../images/xxx.png)` で参照
+- zenn-content リポジトリは **public** にしておくこと（private だと raw.githubusercontent.com の画像が外部から見えない）
+- dev.to API キーは `.env` に書き、`.gitignore` で除外する
