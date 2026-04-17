@@ -1,6 +1,6 @@
 ---
 name: zenn-post
-description: Zennに記事を書いて公開する。「Zennに上げて」「Zennに投稿して」「Zennに出して」と言われたら使う。NotionページをZennに投稿する場合も使う。「dev.toにも上げて」と言われたらdev.toにも英訳して投稿する。
+description: 記事を書いて公開する。「記事公開して」「Zennに上げて」「投稿して」と言われたら使う。デフォルトでZenn（日本語）とdev.to（英訳）の両方に投稿する。「Zennだけ」と言われたらZennのみ。NotionページをZennに投稿する場合も使う。
 argument-hint: [NotionのURLまたはタイトル、またはテーマ]
 allowed-tools: [Read, Edit, Write, Bash]
 ---
@@ -87,13 +87,15 @@ git commit -m "feat: add article <slug>"
 git push origin main
 ```
 
-push 完了を伝えて終了。`https://zenn.dev/your_username` に1〜2分で反映される。
+push 完了後、**続けて dev.to にも投稿する**（下記「dev.to への投稿」を実行）。
+
+「Zennだけ」と明示された場合のみ dev.to をスキップする。
 
 ---
 
-## dev.to への同時投稿（オプション）
+## dev.to への投稿
 
-「dev.toにも上げて」と言われた場合、Zenn 記事の公開後に以下を実行する。
+Zenn 公開後、デフォルトで続けて実行する。
 
 ### dev.to 環境情報
 
