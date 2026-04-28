@@ -2,13 +2,15 @@
 
 Claude Code から Zenn と dev.to に記事を投稿するスキルです。
 
-「記事公開して」と言うだけで、Notion のページや指定したテーマをもとに記事を書いて **Zenn（日本語）と dev.to（英訳）の両方に同時公開**します。
+「記事公開して」と言うだけで、Notion のページや指定したテーマをもとに記事を書いて **Zenn・Qiita（日本語）と dev.to・Hashnode（英訳）の4媒体に同時公開**します。
 
 ## できること
 
 - Notion ページの内容を Zenn 記事に変換して投稿
 - テーマを口頭で伝えるだけで記事を執筆・公開
-- Zenn 公開と同時に英訳して dev.to にも投稿
+- 日本語: Zenn + Qiita に同時投稿
+- 英語: Zenn 記事を英訳して dev.to + Hashnode に同時投稿（翻訳は1回）
+- Hashnode には Zenn を canonical URL として設定（SEO 対策）
 - Mermaid 図を自動で PNG 変換（外部サービス不要・ローカル完結）
 - 公開前にプレビューして確認 → OK で `git push` まで自動実行
 
@@ -16,7 +18,8 @@ Claude Code から Zenn と dev.to に記事を投稿するスキルです。
 
 ```
 「このNotionページをZennに上げて」
-「記事公開して」          ← Zenn + dev.to 両方に投稿
+「記事公開して」          ← Zenn + Qiita + dev.to + Hashnode の4媒体に投稿
+「日本語だけ投稿して」    ← Zenn + Qiita のみ
 「Zennだけに投稿して」    ← Zenn のみ
 ```
 
@@ -47,12 +50,21 @@ git clone https://github.com/bokuno-studio/zenn-post-cc-plugin ~/.claude/plugins
 - Zenn: `https://zenn.dev/your_username`  ← 自分のURLに変更
 ```
 
-**3. dev.to API キーを設定する**
+**3. API キーを設定する**
 
 ```bash
-echo "DEVTO_API_KEY=your_api_key_here" > ~/.claude/plugins/zenn-post/.env
+cat > ~/.claude/plugins/zenn-post/.env << 'EOF'
+DEVTO_API_KEY=your_devto_api_key
+QIITA_ACCESS_TOKEN=your_qiita_token
+HASHNODE_API_TOKEN=your_hashnode_token
+HASHNODE_PUBLICATION_ID=your_publication_id
+EOF
 echo ".env" >> ~/.claude/plugins/zenn-post/.gitignore
 ```
+
+- **dev.to**: Settings → Extensions → DEV API Keys
+- **Qiita**: 設定 → アプリケーション → 個人用アクセストークン（スコープ: `read_qiita` + `write_qiita`）
+- **Hashnode**: Account Settings → Developer → Personal Access Tokens。Publication ID はダッシュボードの URL から確認
 
 **4. Claude Code のプラグインマーケットプレイスに登録**
 
@@ -63,11 +75,12 @@ claude plugin install zenn-post
 
 ## Mermaid 図の扱いについて
 
-dev.to は Mermaid をレンダリングしないため、このスキルは自動的に以下を行います：
+- **Zenn・Qiita**: Mermaid をそのままレンダリングするため変換不要
+- **dev.to・Hashnode**: Mermaid 非対応のため、このスキルは自動的に以下を行います
 
 1. `npx @mermaid-js/mermaid-cli` で Mermaid コードを PNG に変換（ローカル完結）
 2. PNG を zenn-content の `images/` ディレクトリに保存して push
-3. dev.to 記事内の mermaid ブロックを `![図](raw.githubusercontent.com/...)` に置き換え
+3. dev.to・Hashnode 記事内の mermaid ブロックを `![図](raw.githubusercontent.com/...)` に置き換え
 
 ## ライセンス
 
@@ -76,6 +89,13 @@ MIT
 ---
 
 ## 改定履歴
+
+### v0.3.0 (2026-04-27)
+- Qiita への同時投稿機能を追加（日本語、Zenn 記法変換のみ・翻訳不要）
+- Hashnode への同時投稿機能を追加（英語、dev.to の英訳を再利用）
+- Hashnode 投稿時に Zenn を canonical URL として設定（SEO 対策）
+- 投稿先を「日本語: Zenn + Qiita」「英語: dev.to + Hashnode」の4媒体に整理
+- `.env` に Qiita・Hashnode の認証情報を追加
 
 ### v0.2.0 (2026-04-17)
 - dev.to への同時投稿機能を追加
