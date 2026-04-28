@@ -124,15 +124,18 @@ Zenn 公開後、日本語媒体として続けて実行する。
 
 ### Qiita 投稿フロー
 
-#### 1. Zenn 記法を標準 Markdown に変換する
+#### 1. Zenn 記法・画像パスを変換する
 
-Zenn 独自記法を変換する（本文は日本語のまま）：
+Zenn 独自記法と画像パスを変換する（本文は日本語のまま）：
 
-| Zenn 記法 | Qiita Markdown |
+| 変換対象 | 変換後 |
 |-----------|----------------|
 | `:::message` ... `:::` | `> **Note:** ...` |
 | `:::message alert` ... `:::` | `> **⚠️ Warning:** ...` |
 | ```` ```mermaid ``` ```` | そのまま（Qiita は Mermaid をレンダリングする） |
+| `../images/<ファイル名>` | `https://raw.githubusercontent.com/your-github-username/zenn-content/main/images/<ファイル名>` |
+
+画像パスは **必ず絶対 URL に変換すること**。相対パスのままだと Qiita では画像が表示されない。
 
 #### 2. Qiita に投稿する
 
