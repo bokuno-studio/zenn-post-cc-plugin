@@ -133,7 +133,7 @@ Zenn 独自記法と画像パスを変換する（本文は日本語のまま）
 | `:::message` ... `:::` | `> **Note:** ...` |
 | `:::message alert` ... `:::` | `> **⚠️ Warning:** ...` |
 | ```` ```mermaid ``` ```` | そのまま（Qiita は Mermaid をレンダリングする） |
-| `../images/<ファイル名>` | `https://raw.githubusercontent.com/your-github-username/zenn-content/main/images/<ファイル名>` |
+| `/images/<ファイル名>` | `https://raw.githubusercontent.com/your-github-username/zenn-content/main/images/<ファイル名>` |
 
 画像パスは **必ず絶対 URL に変換すること**。相対パスのままだと Qiita では画像が表示されない。
 
@@ -289,7 +289,7 @@ curl -X POST https://gql.hashnode.com \
 ## 注意事項
 
 - 公開前に必ずユーザー確認（`published: true` にする前）
-- 画像を使う場合は `images/` ディレクトリに置いて `![alt](../images/xxx.png)` で参照
+- 画像を使う場合は `images/` ディレクトリに置いて `![alt](/images/xxx.png)` で参照（`../images/` 相対パスはZennで表示されないため **絶対パス必須**）
 - zenn-content リポジトリは **public** にしておくこと（private だと raw.githubusercontent.com の画像が外部から見えない）
 - API キー・トークンはすべて `.env` に書き、`.gitignore` で除外する
 - Hashnode の `originalArticleURL` は必ず設定し、Zenn を正規記事にする
