@@ -1,6 +1,6 @@
-# zenn-post — Claude Code Plugin
+# zenn-post - Claude Code Plugin
 
-Claude Code から Zenn と dev.to に記事を投稿するスキルです。
+Claude Code から Zenn・Qiita・dev.to・Hashnode に記事を投稿するスキルです。
 
 「記事公開して」と言うだけで、Notion のページや指定したテーマをもとに記事を書いて **Zenn・Qiita（日本語）と dev.to・Hashnode（英訳）の4媒体に同時公開**します。
 
@@ -72,6 +72,44 @@ echo ".env" >> ~/.claude/plugins/zenn-post/.gitignore
 claude plugin marketplace add ~/.claude/plugins/zenn-post
 claude plugin install zenn-post
 ```
+
+## 開発・配布メモ
+
+### ローカルマーケットプレイスへ同期
+
+このリポジトリを更新したら、ローカルマーケットプレイスのコピーも明示的に同期します。
+
+```bash
+./scripts/sync-local.sh
+```
+
+- 同期先の既定値: `~/.claude/local-marketplace/plugins/zenn-post`
+- `.env` と `.git/` は同期対象外です
+- 既存の `skills/zenn-post/SKILL.md` にある「環境情報」ブロックは既定で保持します
+- 同期後は `claude plugin update zenn-post@local` を実行し、Claude Code を再起動してキャッシュへ反映します
+
+別の同期先を使う場合:
+
+```bash
+./scripts/sync-local.sh /path/to/local-marketplace/plugins/zenn-post
+```
+
+「環境情報」ブロックもソースで上書きしたい場合:
+
+```bash
+PRESERVE_SKILL_ENV_BLOCK=0 ./scripts/sync-local.sh
+```
+
+### リリース時の確認
+
+`skills/zenn-post/SKILL.md` の description や仕様を変えた場合は、同じPRで `.claude-plugin/plugin.json` の `version` も更新します。
+
+```bash
+./scripts/validate-plugin.sh
+claude plugin validate .
+```
+
+`./scripts/validate-plugin.sh` は、manifest の version が README の最新改定履歴と一致していること、manifest と skill description が4媒体（Zenn/Qiita/dev.to/Hashnode）を明示していることを確認します。
 
 ## Mermaid 図の扱いについて
 
