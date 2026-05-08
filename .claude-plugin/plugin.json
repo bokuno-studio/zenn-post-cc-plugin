@@ -1,5 +1,5 @@
 {
   "name": "zenn-post",
-  "version": "0.2.0",
-  "description": "Zennに記事を書いて公開する"
+  "version": "0.3.0",
+  "description": "記事を書いて公開する。デフォルトでZenn・Qiita（日本語）とdev.to・Hashnode（英訳）の4媒体に同時投稿する。"
 }
